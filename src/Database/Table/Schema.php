@@ -17,6 +17,7 @@ namespace Comely\Fluent\Database\Table;
 use Comely\Fluent\Database\Table\Columns\BinaryColumn;
 use Comely\Fluent\Database\Table\Columns\BlobColumn;
 use Comely\Fluent\Database\Table\Columns\ColumnInterface;
+use Comely\Fluent\Database\Table\Columns\DecimalColumn;
 use Comely\Fluent\Database\Table\Columns\IntegerColumn;
 use Comely\Fluent\Database\Table\Columns\StringColumn;
 use Comely\Fluent\Database\Table\Columns\TextColumn;
@@ -119,5 +120,14 @@ class Schema implements Constants
     final public function blob(string $name): ColumnInterface
     {
         return $this->columns->append(new BlobColumn($name));
+    }
+
+    /**
+     * @param string $name
+     * @return ColumnInterface|DecimalColumn
+     */
+    final public function decimal(string $name): ColumnInterface
+    {
+        return $this->columns->append(new DecimalColumn($name));
     }
 }
