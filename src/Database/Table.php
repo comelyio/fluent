@@ -43,9 +43,4 @@ abstract class Table implements Constants
     }
 
     abstract public function schema(Schema $schema): void;
-
-    private function validate(): void
-    {
-
-    }
 }

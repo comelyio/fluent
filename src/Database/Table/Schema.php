@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Comely\Fluent\Database\Table;
 
-use Comely\Fluent\Database\Table\Columns\AbstractColumn;
 use Comely\Fluent\Database\Table\Columns\BinaryColumn;
 use Comely\Fluent\Database\Table\Columns\BlobColumn;
 use Comely\Fluent\Database\Table\Columns\ColumnInterface;
