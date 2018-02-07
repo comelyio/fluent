@@ -18,6 +18,8 @@ use Comely\Fluent\Database\Table\Columns\BinaryColumn;
 use Comely\Fluent\Database\Table\Columns\BlobColumn;
 use Comely\Fluent\Database\Table\Columns\ColumnInterface;
 use Comely\Fluent\Database\Table\Columns\DecimalColumn;
+use Comely\Fluent\Database\Table\Columns\DoubleColumn;
+use Comely\Fluent\Database\Table\Columns\FloatColumn;
 use Comely\Fluent\Database\Table\Columns\IntegerColumn;
 use Comely\Fluent\Database\Table\Columns\StringColumn;
 use Comely\Fluent\Database\Table\Columns\TextColumn;
@@ -129,5 +131,23 @@ class Schema implements Constants
     final public function decimal(string $name): ColumnInterface
     {
         return $this->columns->append(new DecimalColumn($name));
+    }
+
+    /**
+     * @param string $name
+     * @return ColumnInterface|FloatColumn
+     */
+    final public function float(string $name): ColumnInterface
+    {
+        return $this->columns->append(new FloatColumn($name));
+    }
+
+    /**
+     * @param string $name
+     * @return ColumnInterface|DoubleColumn
+     */
+    final public function double(string $name): ColumnInterface
+    {
+        return $this->columns->append(new DoubleColumn($name));
     }
 }
