@@ -59,7 +59,7 @@ abstract class AbstractColumn implements ColumnInterface
     protected function setDefaultValue($value): self
     {
         if (is_null($value)) {
-            $nullability = $this->attributes["nullable"];
+            $nullability = $this->attributes["nullable"] ?? false;
             if (!$nullability) {
                 throw FluentTableException::ColumnError(
                     $this->name,
