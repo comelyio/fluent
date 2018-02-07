@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace Comely\Fluent\Database;
 
+use Comely\Fluent\Database\Table\Columns;
 use Comely\Fluent\Database\Table\Constants;
-use Comely\Fluent\Database\Table\Schema;
 use Comely\IO\Database\Database;
 
 /**
@@ -26,8 +26,8 @@ abstract class Table implements Constants
 {
     /** @var Database */
     private $db;
-    /** @var Schema */
-    private $schema;
+    /** @var Columns */
+    private $columns;
 
     /**
      * Table constructor.
@@ -36,11 +36,14 @@ abstract class Table implements Constants
     public function __construct(Database $db)
     {
         $this->db = $db;
-        $this->schema = new Schema();
+        $this->columns = new Columns();
 
         // Callback schema method for table structure
-        $this->schema($this->schema);
+        $this->columns($this->columns);
     }
 
-    abstract public function schema(Schema $schema): void;
+    /**
+     * @param Columns $cols
+     */
+    abstract public function columns(Columns $cols): void;
 }
