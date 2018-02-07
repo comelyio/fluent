@@ -42,6 +42,8 @@ class DecimalColumn extends AbstractColumn
     public function __construct(string $name)
     {
         parent::__construct($name);
+        $this->type = "decimal";
+        $this->scalarType = "string";
         $this->digits = 10;
         $this->scale = 0;
         $this->default = "0";
