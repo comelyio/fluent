@@ -195,11 +195,20 @@ class Columns implements \Countable, \Iterator
      */
     public function primaryKey(string $col): void
     {
+        /** @var AbstractColumn $column */
         $column = $this->columns[$col] ?? null;
         if (!$column) {
             throw new FluentTableException(
                 sprintf('Cannot declare undefined "%s" column as primary key', $col)
             );
+        }
+
+        if(!isset($column->_attrs["nullable"])) {
+            throw FluentTableException::ColumnError($column->_name, 'Primary column cannot be nullable');
+        }
+
+        if(is_null($column->_default)) {
+            throw FluentTableException::ColumnError($column->_name, 'Primary column default value cannot be NULL');
         }
 
         $this->primaryKey = $col;
