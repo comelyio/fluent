@@ -37,8 +37,6 @@ class Columns implements \Countable, \Iterator
     private $columns;
     /** @var int */
     private $count;
-    /** @var int */
-    private $index;
     /** @var string */
     private $defaultCharset;
     /** @var string */
@@ -53,7 +51,6 @@ class Columns implements \Countable, \Iterator
     {
         $this->columns = [];
         $this->count = 0;
-        $this->index = 0;
         $this->defaults("utf8mb4", "utf8mb4_unicode_ci");
     }
 
