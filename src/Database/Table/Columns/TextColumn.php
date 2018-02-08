@@ -31,7 +31,6 @@ class TextColumn extends AbstractColumn
     use CharsetColumnTrait;
     use NullableColumnTrait;
     use StringSizeTrait;
-    use StringValueTrait;
 
     /**
      * TextColumn constructor.

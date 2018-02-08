@@ -29,7 +29,6 @@ class BlobColumn extends AbstractColumn
 
     use NullableColumnTrait;
     use StringSizeTrait;
-    use StringValueTrait;
 
     /**
      * TextColumn constructor.
