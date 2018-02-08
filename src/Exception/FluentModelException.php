@@ -20,4 +20,14 @@ namespace Comely\Fluent\Exception;
  */
 class FluentModelException extends FluentException
 {
+    /**
+     * @param string $model
+     * @param string $prop
+     * @param string $message
+     * @return FluentModelException
+     */
+    public static function BadValue(string $model, string $prop, string $message) : self
+    {
+        return new self(sprintf('Property "%s" of FluentModel "%s" %s', $prop, $model, $message));
+    }
 }
