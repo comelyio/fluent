@@ -36,6 +36,7 @@ class SampleTable extends Table
         $cols->string("password")->fixed(40)->nullable()->default(null);
         $cols->binary("token")->fixed(10)->nullable()->default(null);
         $cols->string("country")->fixed(3)->nullable();
+        $cols->int("points")->size(self::INT_SMALL)->default(0);
         $cols->int("time_stamp")->size(self::INT_DEFAULT);
         $cols->primaryKey("id");
 
