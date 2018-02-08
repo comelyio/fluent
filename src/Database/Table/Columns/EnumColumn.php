@@ -14,9 +14,12 @@ declare(strict_types=1);
 
 namespace Comely\Fluent\Database\Table\Columns;
 
+use Comely\Fluent\Exception\FluentTableException;
+
 /**
  * Class EnumColumn
  * @package Comely\Fluent\Database\Table\Columns
+ * @property array $_opts
  */
 class EnumColumn extends AbstractColumn
 {
@@ -42,6 +45,35 @@ class EnumColumn extends AbstractColumn
     public function options(string ...$options): self
     {
         $this->options = $options;
+        return $this;
+    }
+
+    /**
+     * @param $prop
+     * @return bool|mixed
+     */
+    public function __get($prop)
+    {
+        switch ($prop) {
+            case "_opts":
+                return $this->options;
+        }
+
+        return parent::__get($prop);
+    }
+
+    /**
+     * @param string $opt
+     * @return EnumColumn
+     * @throws FluentTableException
+     */
+    public function default(string $opt): self
+    {
+        if (!in_array($opt, $this->options)) {
+            throw FluentTableException::ColumnError($this->name, 'Default value must be from defined ENUM set');
+        }
+
+        $this->setDefaultValue($opt);
         return $this;
     }
 

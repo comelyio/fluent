@@ -32,6 +32,8 @@ class SampleTable extends Table
     public function schema(Columns $cols, Constraints $constraints): void
     {
         $cols->int("id")->size(self::INT_MEDIUM)->unSigned()->autoIncrement();
+        $cols->int("status")->size(self::INT_TINY, 1)->unSigned()->default(0);
+        $cols->enum("role")->options("user","mod")->default("user");
         $cols->string("email")->length(255)->unique();
         $cols->string("password")->fixed(40)->nullable();
         $cols->binary("token")->fixed(10)->nullable();
