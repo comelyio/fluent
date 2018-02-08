@@ -203,7 +203,7 @@ class Columns implements \Countable, \Iterator
             );
         }
 
-        if(!isset($column->_attrs["nullable"])) {
+        if(isset($column->_attrs["nullable"])) {
             throw FluentTableException::ColumnError($column->_name, 'Primary column cannot be nullable');
         }
 
