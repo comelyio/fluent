@@ -208,7 +208,9 @@ class Columns implements \Countable, \Iterator
         }
 
         if(is_null($column->_default)) {
-            throw FluentTableException::ColumnError($column->_name, 'Primary column default value cannot be NULL');
+            if(!$column instanceof IntegerColumn || !$column->_ai) {
+                throw FluentTableException::ColumnError($column->_name, 'Primary column default value cannot be NULL');
+            }
         }
 
         $this->primaryKey = $col;
