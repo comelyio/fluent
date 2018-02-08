@@ -30,7 +30,7 @@ trait LengthColumnTrait
      */
     public function length(int $length): self
     {
-        if (Number::Range($length, self::LENGTH_MIN, self::LENGTH_MAX)) {
+        if (!Number::Range($length, self::LENGTH_MIN, self::LENGTH_MAX)) {
             throw FluentTableException::ColumnError(
                 $this->name,
                 sprintf(
