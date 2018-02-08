@@ -72,7 +72,7 @@ class IntegerColumn extends AbstractColumn
      * @return IntegerColumn
      * @throws FluentTableException
      */
-    public function size(int $bytes, int $digits = null): self
+    public function bytes(int $bytes, int $digits = null): self
     {
         // Bytes
         if (!in_array($bytes, [1, 2, 3, 4, 8])) {
@@ -113,6 +113,17 @@ class IntegerColumn extends AbstractColumn
         }
 
         return $this;
+    }
+
+    /**
+     * @param int $bytes
+     * @param int|null $digits
+     * @return IntegerColumn
+     * @throws FluentTableException
+     */
+    public function size(int $bytes, int $digits = null): self
+    {
+        return $this->bytes($bytes, $digits);
     }
 
     /**
