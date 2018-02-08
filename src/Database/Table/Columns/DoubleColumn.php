@@ -60,4 +60,20 @@ class DoubleColumn extends AbstractColumn
         $this->setDefaultValue($value);
         return $this;
     }
+
+    /**
+     * @param string $driver
+     * @return null|string
+     */
+    protected function columnSQL(string $driver): ?string
+    {
+        switch ($driver) {
+            case "mysql":
+                return sprintf('%s(%d,%d)', $this->type, $this->digits, $this->scale);
+            case "sqlite":
+                return "REAL";
+        }
+
+        return null;
+    }
 }

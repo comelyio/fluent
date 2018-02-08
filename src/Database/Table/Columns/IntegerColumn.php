@@ -22,6 +22,7 @@ use Comely\Fluent\Exception\FluentTableException;
 /**
  * Class IntegerColumn
  * @package Comely\Fluent\Database\Table\Columns
+ * @property bool $_ai
  */
 class IntegerColumn extends AbstractColumn
 {
@@ -49,6 +50,20 @@ class IntegerColumn extends AbstractColumn
         $this->attributes["signed"] = 1; // Signed integer
         $this->bytes = 4; // Default; 4 byte integer
         $this->autoIncrement = false;
+    }
+
+    /**
+     * @param $prop
+     * @return bool|mixed
+     */
+    public function __get($prop)
+    {
+        switch ($prop) {
+            case "_ai":
+                return $this->autoIncrement;
+        }
+
+        return parent::__get($prop);
     }
 
     /**
@@ -118,5 +133,36 @@ class IntegerColumn extends AbstractColumn
     {
         $this->setDefaultValue($value);
         return $this;
+    }
+
+    /**
+     * @param string $driver
+     * @return null|string
+     */
+    protected function columnSQL(string $driver): ?string
+    {
+        switch ($driver) {
+            case "mysql":
+                $digits = "";
+                if ($this->digits) {
+                    $digits = sprintf('(%d)', $this->digits);
+                }
+
+                switch ($this->bytes) {
+                    case 1:
+                        return "tinyint" . $digits;
+                    case 2:
+                        return "smallint" . $digits;
+                    case 3:
+                        return "mediumint" . $digits;
+                    case 8:
+                        return "bigint" . $digits;
+                    default:
+                        return "int" . $digits;
+                }
+            case "sqlite":
+            default:
+                return "integer";
+        }
     }
 }

@@ -44,4 +44,19 @@ class TextColumn extends AbstractColumn
         $this->scalarType = "string";
         $this->size = ""; // default
     }
+
+    /**
+     * @param string $driver
+     * @return null|string
+     */
+    protected function columnSQL(string $driver): ?string
+    {
+        switch ($driver) {
+            case "mysql":
+                return sprintf('%sTEXT', $this->size);
+            case "sqlite":
+            default:
+                return "TEXT";
+        }
+    }
 }

@@ -53,4 +53,20 @@ class StringColumn extends AbstractColumn
         $this->length = 255;
         $this->fixed = false;
     }
+
+    /**
+     * @param string $driver
+     * @return null|string
+     */
+    protected function columnSQL(string $driver): ?string
+    {
+        switch ($driver) {
+            case "mysql":
+                $type = $this->fixed ? "char" : "varchar";
+                return sprintf('%s(%d)', $type, $this->length);
+            case "sqlite":
+            default:
+                return "TEXT";
+        }
+    }
 }
