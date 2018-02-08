@@ -30,6 +30,7 @@ abstract class Table implements Constants
 {
     public const NAME = null;
     public const ENGINE = 'InnoDB';
+    public const MODEL = null;
 
     /** @var Database */
     protected $db;
@@ -37,10 +38,12 @@ abstract class Table implements Constants
     protected $columns;
     /** @var Constraints */
     protected $constraints;
-    /** @var mixed */
+    /** @var string */
     protected $name;
-    /** @var mixed */
+    /** @var string */
     protected $engine;
+    /** @var string */
+    protected $modelsClass;
 
     /**
      * Table constructor.
@@ -64,6 +67,27 @@ abstract class Table implements Constants
             throw new FluentTableException(sprintf('"%s" must define a valid ENGINE constant', get_called_class()));
         }
 
+        // Models class
+        $this->modelsClass = @constant('static::MODEL');
+        if (!is_null($this->modelsClass)) {
+            if (!is_string($this->modelsClass) || !preg_match('/^[a-zA-Z0-9\_\\\]+$/', $this->modelsClass)) {
+                throw new FluentTableException(
+                    sprintf('Provide a valid class name or NULL for MODEL constant for table "%s"', $this->name)
+                );
+            }
+
+            // Make sure class exists and is loadable
+            if (!class_exists($this->modelsClass)) {
+                throw new FluentTableException(
+                    sprintf(
+                        'Models class "%s" not found for table "%s"',
+                        $this->modelsClass,
+                        $this->name
+                    )
+                );
+            }
+        }
+
         // Callback schema method for table structure
         $this->schema($this->columns, $this->constraints);
     }
@@ -79,6 +103,8 @@ abstract class Table implements Constants
                 return $this->name;
             case "_engine":
                 return $this->engine;
+            case "_models":
+                return $this->modelsClass;
         }
 
         return false;
