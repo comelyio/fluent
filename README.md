@@ -2,6 +2,10 @@
 
 Fluent ORM for your Comely apps.
 
+## Supported Adapters
+
+* MySQL 5.7+
+* SQLite3
 
 ## Prerequisites
 
