@@ -30,7 +30,7 @@ use Comely\Fluent\Exception\FluentTableException;
 /**
  * Class Columns
  * @package Comely\Fluent\Database\Table
- * @property null|string $primary
+ * @property null|string $_primary
  */
 class Columns implements \Countable, \Iterator
 {
@@ -62,7 +62,7 @@ class Columns implements \Countable, \Iterator
     public function __get($name)
     {
         switch ($name) {
-            case "primary":
+            case "_primary":
                 return $this->primaryKey;
         }
 
@@ -74,7 +74,7 @@ class Columns implements \Countable, \Iterator
      * @param string $collate
      * @return Columns
      */
-    final public function defaults(string $charset, string $collate): self
+    public function defaults(string $charset, string $collate): self
     {
         $this->defaultCharset = $charset;
         $this->defaultCollate = $collate;
@@ -89,6 +89,29 @@ class Columns implements \Countable, \Iterator
     {
         $this->columns[$column->_name] = $column;
         $this->count++;
+        return $column;
+    }
+
+    /**
+     * @return array
+     */
+    public function names(): array
+    {
+        return array_keys($this->columns);
+    }
+
+    /**
+     * @param string $name
+     * @return ColumnInterface
+     * @throws FluentTableException
+     */
+    public function get(string $name) : ColumnInterface
+    {
+        $column    =   $this->columns[$name] ?? null;
+        if(!$column) {
+            throw new FluentTableException(sprintf('Column "%s" not found', $name));
+        }
+
         return $column;
     }
 
@@ -157,7 +180,7 @@ class Columns implements \Countable, \Iterator
      * @param string $name
      * @return ColumnInterface|DecimalColumn
      */
-    final public function decimal(string $name): ColumnInterface
+    public function decimal(string $name): ColumnInterface
     {
         return $this->append(new DecimalColumn($name));
     }
