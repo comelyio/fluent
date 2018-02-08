@@ -33,9 +33,10 @@ class SampleTable extends Table
     {
         $cols->int("id")->size(self::INT_MEDIUM)->unSigned()->autoIncrement();
         $cols->string("email")->length(255)->unique();
-        $cols->string("password")->fixed(40)->nullable()->default(null);
-        $cols->binary("token")->fixed(10)->nullable()->default(null);
+        $cols->string("password")->fixed(40)->nullable();
+        $cols->binary("token")->fixed(10)->nullable();
         $cols->string("country")->fixed(3)->nullable();
+        $cols->text("notes")->size(self::SIZE_TINY)->default('none');
         $cols->int("points")->size(self::INT_SMALL)->default(0);
         $cols->int("time_stamp")->size(self::INT_DEFAULT);
         $cols->primaryKey("id");
