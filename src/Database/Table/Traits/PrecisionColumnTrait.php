@@ -20,6 +20,8 @@ use Comely\Kernel\Toolkit\Number;
 /**
  * Trait PrecisionColumnTrait
  * @package Comely\Fluent\Database\Table\Traits
+ * @property int $_digits
+ * @property int $_scale
  */
 trait PrecisionColumnTrait
 {
@@ -57,5 +59,22 @@ trait PrecisionColumnTrait
         $this->digits = $digits;
         $this->scale = $scale;
         return $this;
+    }
+
+    /**
+     * @param $prop
+     * @return mixed
+     */
+    public function __get($prop)
+    {
+        switch ($prop) {
+            case "_digits":
+                return $this->digits;
+            case "_scale":
+                return $this->scale;
+        }
+
+        /** @noinspection PhpUndefinedClassInspection */
+        return parent::__get($prop);
     }
 }
