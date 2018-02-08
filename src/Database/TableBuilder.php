@@ -132,7 +132,7 @@ class TableBuilder
             }
 
             // Primary Key
-            if ($column->_attrs === $primaryKey) {
+            if ($column->_name === $primaryKey) {
                 $statement .= " PRIMARY KEY";
             }
 
