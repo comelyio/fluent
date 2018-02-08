@@ -36,12 +36,21 @@ class TableBuilder
      * TableBuilder constructor.
      * @param Table $table
      */
-    public function __construct(Table $table)
+    private function __construct(Table $table)
     {
         $this->table = $table;
         $this->dropExisting = false;
         $this->createIfNotExists = false;
         $this->eolChar = PHP_EOL;
+    }
+
+    /**
+     * @param Table $table
+     * @return TableBuilder
+     */
+    public static function Create(Table $table) : self
+    {
+        return new TableBuilder($table);
     }
 
     /**
