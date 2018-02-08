@@ -128,9 +128,14 @@ class IntegerColumn extends AbstractColumn
 
     /**
      * @return IntegerColumn
+     * @throws FluentTableException
      */
     public function autoIncrement(): self
     {
+        if(is_null($this->default)) {
+            $this->setDefaultValue(0);
+        }
+
         $this->autoIncrement = true;
         return $this;
     }
