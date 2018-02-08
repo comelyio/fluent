@@ -23,7 +23,7 @@ use Comely\Fluent\Exception\FluentTableException;
  * @property array $_attrs
  * @property string $_scalar
  * @property null|string|int $_default
- * @method string getColumnSQL (string $driver)
+ * @method null|string getColumnSQL (string $driver)
  */
 abstract class AbstractColumn implements ColumnInterface
 {
