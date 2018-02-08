@@ -184,7 +184,7 @@ class TableBuilder
                     $statement .= " default NULL";
                 }
             } else {
-                $statement .= " default";
+                $statement .= " default ";
                 $statement .= is_string($column->_default) ? sprintf("'%s'", $column->_default) : $column->_default;
             }
 
