@@ -19,6 +19,11 @@ use Comely\Fluent\Exception\FluentTableException;
 /**
  * Class AbstractColumn
  * @package Comely\Fluent\Database\Table\Columns
+ * @property string $_name
+ * @property array $_attrs
+ * @property string $_scalar
+ * @property null|string|int $_default
+ * @method string getColumnSQL (string $driver)
  */
 abstract class AbstractColumn implements ColumnInterface
 {
@@ -44,11 +49,39 @@ abstract class AbstractColumn implements ColumnInterface
     }
 
     /**
-     * @return string
+     * @param $prop
+     * @return mixed
      */
-    public function name(): string
+    public function __get($prop)
     {
-        return $this->name;
+        switch ($prop) {
+            case "_name":
+                return $this->name;
+            case "_attrs":
+                return $this->attributes;
+            case "_scalar":
+                return $this->scalarType;
+            case "_default":
+                return $this->default;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $name
+     * @param $arguments
+     * @return null|string
+     * @throws FluentTableException
+     */
+    public function __call($name, $arguments)
+    {
+        switch ($name) {
+            case "getColumnSQL":
+                return $this->columnSQL(strval($arguments[0] ?? ""));
+        }
+
+        throw new FluentTableException(sprintf('Calling inaccessible method on column "%s"', $this->name));
     }
 
     /**
@@ -71,4 +104,10 @@ abstract class AbstractColumn implements ColumnInterface
         $this->default = $value;
         return $this;
     }
+
+    /**
+     * @param string $driver
+     * @return null|string
+     */
+    abstract protected function columnSQL(string $driver): ?string;
 }
