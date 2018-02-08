@@ -20,6 +20,7 @@ use Comely\Fluent\Database\Table\Columns\BlobColumn;
 use Comely\Fluent\Database\Table\Columns\ColumnInterface;
 use Comely\Fluent\Database\Table\Columns\DecimalColumn;
 use Comely\Fluent\Database\Table\Columns\DoubleColumn;
+use Comely\Fluent\Database\Table\Columns\EnumColumn;
 use Comely\Fluent\Database\Table\Columns\FloatColumn;
 use Comely\Fluent\Database\Table\Columns\IntegerColumn;
 use Comely\Fluent\Database\Table\Columns\StringColumn;
@@ -177,6 +178,15 @@ class Columns implements \Countable, \Iterator
     public function double(string $name): ColumnInterface
     {
         return $this->append(new DoubleColumn($name));
+    }
+
+    /**
+     * @param string $name
+     * @return ColumnInterface|EnumColumn
+     */
+    public function enum(string $name): ColumnInterface
+    {
+        return $this->append(new EnumColumn($name));
     }
 
     /**
