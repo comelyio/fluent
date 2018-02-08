@@ -24,12 +24,14 @@ use Comely\Fluent\Database\Table\Columns\FloatColumn;
 use Comely\Fluent\Database\Table\Columns\IntegerColumn;
 use Comely\Fluent\Database\Table\Columns\StringColumn;
 use Comely\Fluent\Database\Table\Columns\TextColumn;
+use Comely\Fluent\Exception\FluentTableException;
 
 /**
  * Class Columns
  * @package Comely\Fluent\Database\Table
+ * @property null|string $primary
  */
-class Columns implements \Countable
+class Columns implements \Countable, \Iterator
 {
     /** @var array */
     private $columns;
@@ -41,6 +43,8 @@ class Columns implements \Countable
     private $defaultCharset;
     /** @var string */
     private $defaultCollate;
+    /** @var null|string */
+    private $primaryKey;
 
     /**
      * Columns constructor.
@@ -51,6 +55,20 @@ class Columns implements \Countable
         $this->count = 0;
         $this->index = 0;
         $this->defaults("utf8mb4", "utf8mb4_unicode_ci");
+    }
+
+    /**
+     * @param $name
+     * @return bool|null|string
+     */
+    public function __get($name)
+    {
+        switch ($name) {
+            case "primary":
+                return $this->primaryKey;
+        }
+
+        return false;
     }
 
     /**
@@ -71,7 +89,7 @@ class Columns implements \Countable
      */
     private function append(ColumnInterface $column): ColumnInterface
     {
-        $this->columns[$column->name()] = $column;
+        $this->columns[$column->_name] = $column;
         $this->count++;
         return $column;
     }
@@ -88,7 +106,7 @@ class Columns implements \Countable
      * @param string $name
      * @return ColumnInterface|IntegerColumn
      */
-    final public function int(string $name): ColumnInterface
+    public function int(string $name): ColumnInterface
     {
         return $this->append(new IntegerColumn($name));
     }
@@ -97,7 +115,7 @@ class Columns implements \Countable
      * @param string $name
      * @return ColumnInterface|StringColumn
      */
-    final public function string(string $name): ColumnInterface
+    public function string(string $name): ColumnInterface
     {
         /** @var StringColumn $col */
         $col = $this->append(new StringColumn($name));
@@ -110,7 +128,7 @@ class Columns implements \Countable
      * @param string $name
      * @return ColumnInterface|BinaryColumn
      */
-    final public function binary(string $name): ColumnInterface
+    public function binary(string $name): ColumnInterface
     {
         return $this->append(new BinaryColumn($name));
     }
@@ -119,7 +137,7 @@ class Columns implements \Countable
      * @param string $name
      * @return ColumnInterface|TextColumn
      */
-    final public function text(string $name): ColumnInterface
+    public function text(string $name): ColumnInterface
     {
         /** @var TextColumn $col */
         $col = $this->append(new TextColumn($name));
@@ -132,7 +150,7 @@ class Columns implements \Countable
      * @param string $name
      * @return ColumnInterface|BlobColumn
      */
-    final public function blob(string $name): ColumnInterface
+    public function blob(string $name): ColumnInterface
     {
         return $this->append(new BlobColumn($name));
     }
@@ -150,7 +168,7 @@ class Columns implements \Countable
      * @param string $name
      * @return ColumnInterface|FloatColumn
      */
-    final public function float(string $name): ColumnInterface
+    public function float(string $name): ColumnInterface
     {
         return $this->append(new FloatColumn($name));
     }
@@ -159,8 +177,64 @@ class Columns implements \Countable
      * @param string $name
      * @return ColumnInterface|DoubleColumn
      */
-    final public function double(string $name): ColumnInterface
+    public function double(string $name): ColumnInterface
     {
         return $this->append(new DoubleColumn($name));
+    }
+
+    /**
+     * @param string $col
+     * @throws FluentTableException
+     */
+    public function primaryKey(string $col): void
+    {
+        $column = $this->columns[$col] ?? null;
+        if (!$column) {
+            throw new FluentTableException(
+                sprintf('Cannot declare undefined "%s" column as primary key', $col)
+            );
+        }
+
+        $this->primaryKey = $col;
+    }
+
+    /**
+     * @return void
+     */
+    public function rewind(): void
+    {
+        reset($this->columns);
+    }
+
+    /**
+     * @return ColumnInterface|AbstractColumn
+     */
+    public function current(): ColumnInterface
+    {
+        return current($this->columns);
+    }
+
+    /**
+     * @return string
+     */
+    public function key(): string
+    {
+        return key($this->columns);
+    }
+
+    /**
+     * @return void
+     */
+    public function next(): void
+    {
+        next($this->columns);
+    }
+
+    /**
+     * @return bool
+     */
+    public function valid(): bool
+    {
+        return is_null(key($this->columns)) ? false : true;
     }
 }
