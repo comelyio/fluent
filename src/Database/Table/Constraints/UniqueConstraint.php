@@ -72,7 +72,7 @@ class UniqueConstraint extends AbstractConstraint
             case "mysql":
                 return sprintf('UNIQUE KEY `%s` (%s)', $this->name, $columns);
             case "sqlite":
-                return sprintf('CONSTRAINT `%s` UNIQUE (%s)', $this->name, $this->columns);
+                return sprintf('CONSTRAINT `%s` UNIQUE (%s)', $this->name, $columns);
         }
 
         return null;
