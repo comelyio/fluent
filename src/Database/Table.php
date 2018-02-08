@@ -16,34 +16,101 @@ namespace Comely\Fluent\Database;
 
 use Comely\Fluent\Database\Table\Columns;
 use Comely\Fluent\Database\Table\Constants;
+use Comely\Fluent\Database\Table\Constraints;
+use Comely\Fluent\Exception\FluentTableException;
 use Comely\IO\Database\Database;
 
 /**
  * Class Table
  * @package Comely\Fluent\Database
+ * @property string $_name
+ * @property string $_engine
  */
 abstract class Table implements Constants
 {
+    public const NAME = null;
+    public const ENGINE = 'InnoDB';
+
     /** @var Database */
-    private $db;
+    protected $db;
     /** @var Columns */
-    private $columns;
+    protected $columns;
+    /** @var Constraints */
+    protected $constraints;
+    /** @var mixed */
+    protected $name;
+    /** @var mixed */
+    protected $engine;
 
     /**
      * Table constructor.
      * @param Database $db
+     * @throws FluentTableException
      */
-    public function __construct(Database $db)
+    final public function __construct(Database $db)
     {
         $this->db = $db;
         $this->columns = new Columns();
+        $this->constraints = new Constraints();
+
+        // Get table names and engine
+        $this->name = @constant('static::NAME');
+        if (!is_string($this->name) || !preg_match('/^[a-zA-Z0-9\_]+$/', $this->name)) {
+            throw new FluentTableException(sprintf('"%s" must define a valid NAME constant', get_called_class()));
+        }
+
+        $this->engine = @constant('static::ENGINE');
+        if (!is_string($this->engine) || !preg_match('/^[a-zA-Z]+$/', $this->engine)) {
+            throw new FluentTableException(sprintf('"%s" must define a valid ENGINE constant', get_called_class()));
+        }
 
         // Callback schema method for table structure
-        $this->columns($this->columns);
+        $this->schema($this->columns, $this->constraints);
+    }
+
+    /**
+     * @param $prop
+     * @return bool|mixed
+     */
+    final public function __get($prop)
+    {
+        switch ($prop) {
+            case "_name":
+                return $this->name;
+            case "_engine":
+                return $this->engine;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return Database
+     */
+    final public function db(): Database
+    {
+        return $this->db;
+    }
+
+    /**
+     * @return Columns
+     */
+    final public function columns(): Columns
+    {
+        return $this->columns;
+    }
+
+    /**
+     * @return Constraints
+     */
+    final public function constraints(): Constraints
+    {
+        return $this->constraints;
     }
 
     /**
      * @param Columns $cols
+     * @param Constraints|null $constraints
      */
-    abstract public function columns(Columns $cols): void;
+    abstract public function schema(Columns $cols, Constraints $constraints): void;
 }
