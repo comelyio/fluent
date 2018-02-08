@@ -25,7 +25,7 @@ trait NumericColumnTrait
      */
     final public function signed(): self
     {
-        $this->attributes["signed"] = 1;
+        $this->attributes["unsigned"] = 0;
         return $this;
     }
 
@@ -34,7 +34,7 @@ trait NumericColumnTrait
      */
     final public function unSigned(): self
     {
-        $this->attributes["signed"] = 0;
+        $this->attributes["unsigned"] = 1;
         return $this;
     }
 }
