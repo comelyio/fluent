@@ -46,7 +46,6 @@ class IntegerColumn extends AbstractColumn
         parent::__construct($name);
         $this->type = "int";
         $this->scalarType = "integer";
-        $this->attributes["nullable"] = false;
         $this->attributes["signed"] = 1; // Signed integer
         $this->bytes = 4; // Default; 4 byte integer
         $this->autoIncrement = false;
