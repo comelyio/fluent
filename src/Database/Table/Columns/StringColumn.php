@@ -18,6 +18,7 @@ use Comely\Fluent\Database\Table\Traits\CharsetColumnTrait;
 use Comely\Fluent\Database\Table\Traits\LengthColumnTrait;
 use Comely\Fluent\Database\Table\Traits\NullableColumnTrait;
 use Comely\Fluent\Database\Table\Traits\StringValueTrait;
+use Comely\Fluent\Database\Table\Traits\UniqueColumnTrait;
 
 /**
  * Class StringColumn
@@ -38,6 +39,7 @@ class StringColumn extends AbstractColumn
     use LengthColumnTrait;
     use NullableColumnTrait;
     use StringValueTrait;
+    use UniqueColumnTrait;
 
     /**
      * StringColumn constructor.

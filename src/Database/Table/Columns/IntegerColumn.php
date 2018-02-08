@@ -16,6 +16,7 @@ namespace Comely\Fluent\Database\Table\Columns;
 
 use Comely\Fluent\Database\Table\Traits\NullableColumnTrait;
 use Comely\Fluent\Database\Table\Traits\NumericColumnTrait;
+use Comely\Fluent\Database\Table\Traits\UniqueColumnTrait;
 use Comely\Fluent\Exception\FluentTableException;
 
 /**
@@ -28,9 +29,12 @@ class IntegerColumn extends AbstractColumn
     protected $bytes;
     /** @var null|int */
     protected $digits;
+    /** @var bool */
+    protected $autoIncrement;
 
     use NullableColumnTrait;
     use NumericColumnTrait;
+    use UniqueColumnTrait;
 
     /**
      * IntegerColumn constructor.
@@ -44,6 +48,7 @@ class IntegerColumn extends AbstractColumn
         $this->attributes["nullable"] = false;
         $this->attributes["signed"] = 1; // Signed integer
         $this->bytes = 4; // Default; 4 byte integer
+        $this->autoIncrement = false;
     }
 
     /**
@@ -92,6 +97,15 @@ class IntegerColumn extends AbstractColumn
             $this->digits = $digits;
         }
 
+        return $this;
+    }
+
+    /**
+     * @return IntegerColumn
+     */
+    public function autoIncrement(): self
+    {
+        $this->autoIncrement = true;
         return $this;
     }
 

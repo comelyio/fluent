@@ -17,6 +17,7 @@ namespace Comely\Fluent\Database\Table\Columns;
 use Comely\Fluent\Database\Table\Traits\LengthColumnTrait;
 use Comely\Fluent\Database\Table\Traits\NullableColumnTrait;
 use Comely\Fluent\Database\Table\Traits\StringValueTrait;
+use Comely\Fluent\Database\Table\Traits\UniqueColumnTrait;
 
 /**
  * Class BinaryColumn
@@ -36,6 +37,7 @@ class BinaryColumn extends AbstractColumn
     use LengthColumnTrait;
     use NullableColumnTrait;
     use StringValueTrait;
+    use UniqueColumnTrait;
 
     /**
      * BinaryColumn constructor.
