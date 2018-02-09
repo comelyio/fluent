@@ -110,7 +110,7 @@ class TableBuilder
         // Continue...
         $statement .= sprintf(' `%s` (%s', $this->table->_name, $this->eolChar);
         $columns = $this->table->columns();
-        $primaryKey = $columns->primary;
+        $primaryKey = $columns->_primary;
         $mysqlUniqueKeys = [];
 
         foreach ($columns as $column) {
