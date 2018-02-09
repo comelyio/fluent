@@ -63,7 +63,7 @@ abstract class Model implements \Serializable
         $this->original = [];
 
         // Check TABLE constant
-        $table = @constant('static::TABLE');
+        $table = static::TABLE;
         if (!is_string($table) || !preg_match('/^[a-zA-Z0-9\_\\\]+$/', $table)) {
             throw new FluentModelException(
                 sprintf('Invalid value for TABLE constant in FluentModel class "%s"', $this->name)
@@ -90,7 +90,7 @@ abstract class Model implements \Serializable
      */
     final private function serializable(): bool
     {
-        $serializable = @constant('static::SERIALIZABLE');
+        $serializable = static::SERIALIZABLE;
         if (!is_bool($serializable)) {
             throw new FluentModelException(
                 sprintf('constant SERIALIZABLE declared in "%s" must be of type boolean', $this->name)
