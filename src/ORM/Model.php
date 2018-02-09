@@ -29,10 +29,16 @@ use Comely\Kernel\Comely;
 /**
  * Class Model
  * @package Comely\Fluent\ORM
+ * @method void onLoad()
+ * @method void onSleep()
+ * @method void onWakeup()
+ * @method void beforeQuery()
+ * @method void afterQuery()
  */
-abstract class Model
+abstract class Model implements \Serializable
 {
     public const TABLE = null;
+    public const SERIALIZABLE = false;
 
     /** @var string */
     private $name;
@@ -65,15 +71,138 @@ abstract class Model
         }
 
         // Load table
+        $this->loadTable($table);
+
+        // Populate
+        if (is_array($row)) {
+            $this->populate($row);
+        }
+
+        // Callback event: onLoad
+        if (method_exists($this, "onLoad")) {
+            call_user_func([$this, "onLoad"]);
+        }
+    }
+
+    /**
+     * @return bool
+     * @throws FluentModelException
+     */
+    final private function serializable(): bool
+    {
+        $serializable = @constant('static::SERIALIZABLE');
+        if (!is_bool($serializable)) {
+            throw new FluentModelException(
+                sprintf('constant SERIALIZABLE declared in "%s" must be of type boolean', $this->name)
+            );
+        }
+
+        return $serializable;
+    }
+
+    /**
+     * @param string $table
+     * @throws FluentModelException
+     */
+    final private function loadTable(string $table): void
+    {
         try {
             $this->table = Fluent::Retrieve($table);
         } catch (FluentException $e) {
             throw new FluentModelException($e->getMessage());
         }
+    }
 
-        // Populate
-        if (is_array($row)) {
-            $this->populate($row);
+    /**
+     * @return string
+     * @throws FluentModelException
+     */
+    final public function serialize(): string
+    {
+        // Serialization allowed for this model?
+        if (!$this->serializable()) {
+            throw new FluentModelException(
+                sprintf('Cannot serialize "%s", constant SERIALIZABLE must be set to bool(TRUE)', $this->name)
+            );
+        }
+
+        // Callback event: onSleep
+        if (method_exists($this, "onSleep")) {
+            call_user_func([$this, "onSleep"]);
+        }
+
+        // Get all properties from ReflectionClass
+        $props = [];
+        $reflect = new \ReflectionClass($this);
+        /** @var $prop \ReflectionProperty */
+        foreach ($reflect->getProperties() as $prop) {
+            if ($prop->getDeclaringClass() === __CLASS__) {
+                // Private props. from this (abstract Model) class will not be reflected anyway
+                // still ignore any visible property declared here = future-proof
+                continue;
+            }
+
+            $prop->setAccessible(true); // Set accessibility
+
+            if (!$prop->isDefault()) {
+                continue; // Ignore dynamically declared property
+            } elseif ($prop->isStatic()) {
+                continue; // Ignore static properties
+            }
+
+            // Append
+            $props[$prop->getName()] = $prop->getValue($this);
+        }
+
+        // Manually declare properties of this (abstract Model) class
+        $fluent = [];
+        $fluent["name"] = $this->name;
+        $fluent["table"] = $this->table->_name;
+        $fluent["privateProps"] = $this->privateProps;
+        $fluent["original"] = $this->original;
+        $fluent["primaryColumn"] = null;
+
+        return serialize(["props" => $props, "fluent" => $fluent]);
+    }
+
+    /**
+     * @param string $serialized
+     * @throws FluentModelException
+     */
+    final public function unserialize($serialized)
+    {
+        $data = unserialize($serialized);
+        $props = $data["props"] ?? null;
+        $fluent = $data["fluent"] ?? null;
+        if (!is_array($props) || !is_array($fluent)) {
+            throw new FluentModelException(
+                sprintf('Cannot retrieve "%s" instance, serialized string may be corrupted', $this->name)
+            );
+        }
+
+        $reflect = new \ReflectionClass($this);
+        /** @var $prop \ReflectionProperty */
+        foreach ($reflect->getProperties() as $prop) {
+            $propValue = $props[$prop->getName()] ?? null;
+            if ($propValue) {
+                $prop->setAccessible(true); // Set accessibility
+                $prop->setValue($this, $propValue);
+            }
+        }
+        unset($prop, $value);
+
+        // Fluent Properties
+        foreach ($fluent as $prop => $value) {
+            $this->$prop = $value; // Set fluent props.
+        }
+
+        // Bootstrap
+        /** @noinspection PhpStrictTypeCheckingInspection */
+        $this->loadTable($this->table);
+
+        // Callback event: onWakeup
+        if (method_exists($this, "onWakeup")) {
+            call_user_func([$this, "onWakeup"]);
         }
     }
 
@@ -141,9 +270,14 @@ abstract class Model
     /**
      * @param string $prop
      * @param $value
+     * @throws FluentModelException
      */
     final public function set(string $prop, $value): void
     {
+        if (!is_scalar($value)) {
+            throw new FluentModelException(sprintf('Cannot set non-scalar value for "%s" prop.', $prop));
+        }
+
         // Check if property exists with get_called_class() instead of $this instance for only public props.
         // $this->name = get_called_class()
         if (property_exists($this->name, $prop)) {
