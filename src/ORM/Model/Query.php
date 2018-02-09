@@ -26,6 +26,8 @@ use Comely\IO\Database\Exception\DatabaseException;
  */
 class Query
 {
+    /** @var bool */
+    private $used;
     /** @var Model */
     private $model;
     /** @var array */
@@ -42,6 +44,7 @@ class Query
      */
     public function __construct(Model $model)
     {
+        $this->used = false;
         $this->model = $model;
         try {
             $this->changes = $model->difference();
@@ -53,6 +56,34 @@ class Query
         if ($primaryColumn) {
             $this->matchColumn = $primaryColumn->_name;
             $this->matchValue = $this->changes[$this->matchColumn] ?? null;
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function afterQuery(): void
+    {
+        $this->used = true; // Mark as used
+
+        // Callback event: afterQuery
+        if (method_exists($this->model, "afterQuery")) {
+            $this->model->afterQuery();
+        }
+    }
+
+    /**
+     * @throws ModelQueryException
+     */
+    private function beforeQuery(): void
+    {
+        if ($this->used) {
+            throw new ModelQueryException('Query instance already used. Create a new instance instead.');
+        }
+
+        // Callback event: beforeQuery
+        if (method_exists($this->model, "beforeQuery")) {
+            $this->model->beforeQuery();
         }
     }
 
@@ -121,6 +152,7 @@ class Query
      */
     public function save(?callable $callback = null): bool
     {
+        $this->beforeQuery();
         $this->validateMatchClause("save");
         $table = $this->model->table();
 
@@ -154,6 +186,7 @@ class Query
             $callback($table->db()->lastQuery());
         }
 
+        $this->afterQuery();
         return $lastQuery->rows ? true : false;
     }
 
@@ -164,6 +197,7 @@ class Query
      */
     public function insert(?callable $callback = null): bool
     {
+        $this->beforeQuery();
         $table = $this->model->table();
         $original = $this->model->original();
         if (count($original)) {
@@ -198,6 +232,7 @@ class Query
             $callback($table->db()->lastQuery());
         }
 
+        $this->afterQuery();
         return $lastQuery->rows ? true : false;
     }
 
@@ -208,6 +243,7 @@ class Query
      */
     public function update(?callable $callback = null): bool
     {
+        $this->beforeQuery();
         $this->validateMatchClause("update");
         $table = $this->model->table();
 
@@ -242,6 +278,7 @@ class Query
             $callback($lastQuery);
         }
 
+        $this->afterQuery();
         return $lastQuery->rows ? true : false;
     }
 
@@ -252,6 +289,7 @@ class Query
      */
     public function delete(?callable $callback = null): bool
     {
+        $this->beforeQuery();
         $this->validateMatchClause("delete");
         $table = $this->model->table();
         $query = sprintf('DELETE' . ' FROM `%s` WHERE `%s`=?', $table->_name, $this->matchColumn);
@@ -268,6 +306,8 @@ class Query
             $callback($lastQuery);
         }
 
+
+        $this->afterQuery();
         return $lastQuery->rows ? true : false;
     }
 }
