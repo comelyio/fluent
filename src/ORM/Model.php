@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Comely\Fluent\ORM;
 
+use Comely\Fluent\Database\Table;
 use Comely\Fluent\Database\Table\Columns\AbstractColumn;
 use Comely\Fluent\Database\Table\Columns\DoubleColumn;
 use Comely\Fluent\Database\Table\Columns\FloatColumn;
@@ -21,6 +22,7 @@ use Comely\Fluent\Exception\FluentException;
 use Comely\Fluent\Exception\FluentModelException;
 use Comely\Fluent\Exception\FluentTableException;
 use Comely\Fluent\Fluent;
+use Comely\Fluent\ORM\Model\Query;
 use Comely\Kernel\Comely;
 
 /**
@@ -32,14 +34,16 @@ abstract class Model
     public const TABLE = null;
 
     /** @var string */
-    protected $name;
+    private $name;
     /** @var \Comely\Fluent\Database\Table */
-    protected $table;
+    private $table;
     /** @var array */
-    protected $privateProps;
+    private $privateProps;
 
     /** @var array */
     private $original;
+    /** @var null|AbstractColumn */
+    private $primaryColumn;
 
     /**
      * Model constructor.
@@ -119,6 +123,22 @@ abstract class Model
     }
 
     /**
+     * @return string
+     */
+    final public function name(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return Table
+     */
+    final public function table(): Table
+    {
+        return $this->table;
+    }
+
+    /**
      * @param string $prop
      * @param $value
      */
@@ -142,5 +162,106 @@ abstract class Model
         return $this->privateProps[$prop] ?? null;
     }
 
+    /**
+     * @param AbstractColumn $column
+     * @param string $key
+     * @param $value
+     * @throws FluentModelException
+     */
+    final public function validateColumnValue(AbstractColumn $column, string $key, $value): void
+    {
+        if (is_null($value)) {
+            if (!isset($column->_attrs["nullable"])) {
+                throw FluentModelException::BadValue($this->name, $key, 'cannot be NULL');
+            }
+        } else {
+            // Compare scalar type
+            $valueType = gettype($value);
+            if ($valueType !== $column->_scalar) {
+                throw FluentModelException::BadValue(
+                    $this->name,
+                    $key,
+                    sprintf('must be of type "%s", given "%s"', $column->_scalar, $valueType)
+                );
+            }
+        }
+    }
 
+    /**
+     * @return array
+     */
+    final public function original(): array
+    {
+        return $this->original;
+    }
+
+    /**
+     * @return array
+     * @throws FluentModelException
+     */
+    final public function difference(): array
+    {
+        $difference = [];
+        foreach ($this->table->columns() as $column) {
+            $camelKey = Comely::camelCase($column->_name);
+            $existingValue = $this->$camelKey ?? $this->privateProps[$camelKey] ?? null;
+            $originalValue = $this->original[$column->_name] ?? null;
+
+            // Validate existing value as per column type
+            $this->validateColumnValue($column, $camelKey, $existingValue);
+
+            // Compare with original value
+            if (is_null($originalValue)) {
+                // Original value does NOT exist (or is NULL)
+                $difference[$column->_name] = $existingValue;
+            } else {
+                // Original value found, compare
+                if ($existingValue !== $originalValue) {
+                    $difference[$column->_name] = $existingValue;
+                }
+            }
+        }
+
+        return $difference;
+    }
+
+    /**
+     * @return AbstractColumn|null
+     */
+    final public function getPrimaryColumn(): ?AbstractColumn
+    {
+        if ($this->primaryColumn) {
+            return $this->primaryColumn;
+        }
+
+        // grab Columns
+        $columns = $this->table->columns();
+
+        // Table has PRIMARY KEY defined?
+        if ($columns->_primary) {
+            try {
+                $this->primaryColumn = $columns->get($columns->_primary);
+                return $this->primaryColumn;
+            } catch (FluentTableException $e) {
+            }
+        }
+
+        // Look for first UNIQUE KEY
+        foreach ($this->table->columns() as $column) {
+            if (isset($column->_attrs["unique"])) {
+                $this->primaryColumn = $column;
+                return $this->primaryColumn;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return Query
+     */
+    final public function query(): Query
+    {
+        return new Query($this);
+    }
 }
