@@ -69,6 +69,16 @@ abstract class AbstractColumn implements ColumnInterface
     }
 
     /**
+     * @param $prop
+     * @param $value
+     * @throws FluentTableException
+     */
+    final public function __set($prop, $value)
+    {
+        throw new FluentTableException('Overriding inaccessible properties not allowed');
+    }
+
+    /**
      * @param $name
      * @param $arguments
      * @return null|string

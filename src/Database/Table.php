@@ -121,6 +121,17 @@ abstract class Table implements Constants
     }
 
     /**
+     * @param $prop
+     * @param $value
+     * @throws FluentTableException
+     */
+    final public function __set($prop, $value)
+    {
+        throw new FluentTableException('Overriding inaccessible properties not allowed');
+    }
+
+
+    /**
      * @param string $col
      * @param $value
      * @return Model
