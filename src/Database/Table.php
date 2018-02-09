@@ -17,8 +17,12 @@ namespace Comely\Fluent\Database;
 use Comely\Fluent\Database\Table\Columns;
 use Comely\Fluent\Database\Table\Constants;
 use Comely\Fluent\Database\Table\Constraints;
+use Comely\Fluent\Exception\FluentException;
 use Comely\Fluent\Exception\FluentTableException;
+use Comely\Fluent\Fluent;
+use Comely\Fluent\ORM\Model;
 use Comely\IO\Database\Database;
+use Comely\IO\Database\Exception\DatabaseException;
 use Comely\Kernel\Traits\NotCloneableTrait;
 use Comely\Kernel\Traits\NotSerializableTrait;
 
@@ -27,6 +31,7 @@ use Comely\Kernel\Traits\NotSerializableTrait;
  * @package Comely\Fluent\Database
  * @property string $_name
  * @property string $_engine
+ * @property string $_models
  */
 abstract class Table implements Constants
 {
@@ -62,18 +67,18 @@ abstract class Table implements Constants
         $this->constraints = new Constraints();
 
         // Get table names and engine
-        $this->name = @constant('static::NAME');
+        $this->name = static::NAME;
         if (!is_string($this->name) || !preg_match('/^[a-zA-Z0-9\_]+$/', $this->name)) {
             throw new FluentTableException(sprintf('"%s" must define a valid NAME constant', get_called_class()));
         }
 
-        $this->engine = @constant('static::ENGINE');
+        $this->engine = static::ENGINE;
         if (!is_string($this->engine) || !preg_match('/^[a-zA-Z]+$/', $this->engine)) {
             throw new FluentTableException(sprintf('"%s" must define a valid ENGINE constant', get_called_class()));
         }
 
         // Models class
-        $this->modelsClass = @constant('static::MODEL');
+        $this->modelsClass = static::MODEL;
         if (!is_null($this->modelsClass)) {
             if (!is_string($this->modelsClass) || !preg_match('/^[a-zA-Z0-9\_\\\]+$/', $this->modelsClass)) {
                 throw new FluentTableException(
@@ -113,6 +118,41 @@ abstract class Table implements Constants
         }
 
         return false;
+    }
+
+    /**
+     * @param string $col
+     * @param $value
+     * @return Model
+     * @throws FluentException
+     * @throws FluentTableException
+     */
+    final public static function findBy(string $col, $value): Model
+    {
+        $table = Fluent::Retrieve(strval(static::NAME));
+        $modelsClass = $table->_models;
+        if (!$modelsClass) {
+            throw new FluentException(sprintf('constant MODELS not defined for table "%s"', get_called_class()));
+        }
+
+        $column = $table->columns->get($col);
+        try {
+            $fetched = $table->db()->query()->table($table->_name)
+                ->find(["" . $column->_name . "" => $value])
+                ->limit(1)
+                ->fetch();
+        } catch (DatabaseException $e) {
+            throw new FluentException($e->getMessage());
+        }
+
+        $first = $fetched->first();
+        if (!$first) {
+            throw new FluentException(
+                sprintf('No row matching "%s" returned from table "%s"', $column->_name, $table->_name)
+            );
+        }
+
+        return new $modelsClass($first);
     }
 
     /**
