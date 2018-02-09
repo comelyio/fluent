@@ -16,7 +16,6 @@ namespace Comely\Fluent\Database\Table\Columns;
 
 use Comely\Fluent\Database\Table\Traits\NullableColumnTrait;
 use Comely\Fluent\Database\Table\Traits\StringSizeTrait;
-use Comely\Fluent\Database\Table\Traits\StringValueTrait;
 
 /**
  * Class BlobColumn
