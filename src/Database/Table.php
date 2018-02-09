@@ -19,6 +19,8 @@ use Comely\Fluent\Database\Table\Constants;
 use Comely\Fluent\Database\Table\Constraints;
 use Comely\Fluent\Exception\FluentTableException;
 use Comely\IO\Database\Database;
+use Comely\Kernel\Traits\NotCloneableTrait;
+use Comely\Kernel\Traits\NotSerializableTrait;
 
 /**
  * Class Table
@@ -31,6 +33,9 @@ abstract class Table implements Constants
     public const NAME = null;
     public const ENGINE = 'InnoDB';
     public const MODEL = null;
+
+    use NotSerializableTrait;
+    use NotCloneableTrait;
 
     /** @var Database */
     protected $db;
