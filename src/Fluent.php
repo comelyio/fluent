@@ -63,7 +63,7 @@ class Fluent
     {
         $table = self::$tables[$name] ?? self::$tables[self::$index[$name] ?? ""] ?? null;
         if (!$table) {
-            throw new FluentException(sprintf('FluentTable "%s" not found', $name));
+            throw new FluentException(sprintf('Table "%s" is not bound with Fluent', $name));
         }
 
         return $table;
