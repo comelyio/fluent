@@ -102,7 +102,7 @@ class Columns implements \Countable, \Iterator
 
     /**
      * @param string $name
-     * @return ColumnInterface
+     * @return ColumnInterface|AbstractColumn
      * @throws FluentTableException
      */
     public function get(string $name) : ColumnInterface
