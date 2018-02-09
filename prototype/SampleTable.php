@@ -37,7 +37,7 @@ class SampleTable extends FluentTable
         $cols->int("id")->size(self::INT_MEDIUM)->unSigned()->autoIncrement();
         $cols->int("status")->size(self::INT_TINY, 1)->unSigned()->default(0);
         $cols->enum("role")->options("user", "mod")->default("user");
-        $cols->string("email")->length(255)->unique();
+        $cols->string("email_address")->length(255)->unique();
         $cols->string("password")->fixed(40)->nullable();
         $cols->binary("token")->fixed(10)->nullable();
         $cols->string("country")->fixed(3)->nullable();

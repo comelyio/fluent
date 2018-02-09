@@ -23,4 +23,19 @@ use Comely\Fluent\ORM\FluentModel;
 class SampleModel extends FluentModel
 {
     public const TABLE = 'App\Database\SampleTable';
+
+    /** @var int */
+    public $id;
+    /** @var int */
+    public $status;
+    /** @var string */
+    public $role;
+    /** @var string */
+    public $emailAddress;
+    /** @var string */
+    public $country;
+    /** @var int */
+    public $points;
+    /** @var int */
+    public $timeStamp;
 }
