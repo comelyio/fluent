@@ -22,6 +22,7 @@ use Comely\Fluent\Exception\FluentException;
 use Comely\Fluent\Exception\FluentModelException;
 use Comely\Fluent\Exception\FluentTableException;
 use Comely\Fluent\Fluent;
+use Comely\Fluent\ORM\Model\Lock;
 use Comely\Fluent\ORM\Model\Query;
 use Comely\Kernel\Comely;
 
@@ -39,7 +40,6 @@ abstract class Model
     private $table;
     /** @var array */
     private $privateProps;
-
     /** @var array */
     private $original;
     /** @var null|AbstractColumn */
@@ -157,6 +157,15 @@ abstract class Model
      * @param string $prop
      * @return mixed|null
      */
+    final public function get(string $prop)
+    {
+        return $this->$prop ?? $this->privateProps[$prop] ?? null;
+    }
+
+    /**
+     * @param string $prop
+     * @return mixed|null
+     */
     final public function private(string $prop)
     {
         return $this->privateProps[$prop] ?? null;
@@ -263,5 +272,13 @@ abstract class Model
     final public function query(): Query
     {
         return new Query($this);
+    }
+
+    /**
+     * @return Lock
+     */
+    final public function lock(): Lock
+    {
+        return new Lock($this);
     }
 }
