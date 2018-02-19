@@ -32,6 +32,7 @@ use Comely\Kernel\Traits\NotSerializableTrait;
  * @property string $_name
  * @property string $_engine
  * @property string $_models
+ * @method void callback()
  */
 abstract class Table implements Constants
 {
@@ -96,6 +97,11 @@ abstract class Table implements Constants
                     )
                 );
             }
+        }
+
+        // Constructor callback
+        if (method_exists($this, "callback")) {
+            call_user_func([$this, "callback"]);
         }
 
         // Callback schema method for table structure
