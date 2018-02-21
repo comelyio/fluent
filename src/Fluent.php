@@ -24,6 +24,11 @@ use Comely\IO\Database\Database;
  */
 class Fluent
 {
+    /** string Comely Fluent Version (Major.Minor.Release-Suffix) */
+    public const VERSION = "1.0.2";
+    /** int Comely Fluent Version (Major * 10000 + Minor * 100 + Release) */
+    public const VERSION_ID = 10002;
+
     /** @var array */
     private static $tables = [];
     /** @var array */
