@@ -274,7 +274,7 @@ abstract class Model implements \Serializable
      */
     final public function set(string $prop, $value): void
     {
-        if (!is_scalar($value)) {
+        if (!is_scalar($value) && !is_null($value)) {
             throw new FluentModelException(sprintf('Cannot set non-scalar value for "%s" prop.', $prop));
         }
 
