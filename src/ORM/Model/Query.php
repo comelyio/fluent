@@ -32,8 +32,6 @@ class Query
     private $model;
     /** @var array */
     private $changes;
-    /** @var array */
-    private $original;
     /** @var null|string */
     private $matchColumn;
     /** @var null|string|int|float */
@@ -48,7 +46,6 @@ class Query
     {
         $this->used = false;
         $this->model = $model;
-        $this->original = $model->original();
 
         try {
             $this->changes = $model->difference();
@@ -59,7 +56,7 @@ class Query
         $primaryColumn = $model->getPrimaryColumn();
         if ($primaryColumn) {
             $this->matchColumn = $primaryColumn->_name;
-            $this->matchValue = $this->original[$this->matchColumn] ?? null;
+            $this->matchValue = $this->model->value($primaryColumn);
         }
     }
 
@@ -203,7 +200,8 @@ class Query
     {
         $this->beforeQuery();
         $table = $this->model->table();
-        if (count($this->original)) {
+        $original = $this->model->original();
+        if (count($original)) {
             throw new ModelQueryException(
                 sprintf('INSERT query cannot be used on already existing "%s" row', $table->_name)
             );

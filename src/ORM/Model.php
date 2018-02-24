@@ -339,6 +339,15 @@ abstract class Model implements \Serializable
     }
 
     /**
+     * @param AbstractColumn $column
+     * @return mixed|null
+     */
+    final public function value(AbstractColumn $column)
+    {
+        return $this->original[$column->_name] ?? null;
+    }
+
+    /**
      * @return array
      * @throws FluentModelException
      */
