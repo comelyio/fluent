@@ -113,7 +113,7 @@ class Lock
         );
 
         try {
-            $fetch = $table->db()->fetch($query, $this->matchValue);
+            $fetch = $table->db()->fetch($query, [$this->matchValue]);
         } catch (DatabaseException $e) {
             throw new ModelLockException($e->getMessage());
         }

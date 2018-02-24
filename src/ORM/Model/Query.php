@@ -176,7 +176,7 @@ class Query
 
 
         try {
-            $table->db()->exec($query, ...$this->changes);
+            $table->db()->exec($query, $this->changes);
         } catch (DatabaseException $e) {
             throw ModelQueryException::QueryFailed("save", $table->_name);
         }
@@ -222,7 +222,7 @@ class Query
         );
 
         try {
-            $table->db()->exec($query, ...$this->changes);
+            $table->db()->exec($query, $this->changes);
         } catch (DatabaseException $e) {
             throw ModelQueryException::QueryFailed("insert", $table->_name);
         }
@@ -268,7 +268,7 @@ class Query
         );
 
         try {
-            $table->db()->exec($query, ...$updateValues);
+            $table->db()->exec($query, $updateValues);
         } catch (DatabaseException $e) {
             throw ModelQueryException::QueryFailed("update", $table->_name);
         }
@@ -296,7 +296,7 @@ class Query
         $query = sprintf('DELETE' . ' FROM `%s` WHERE `%s`=?', $table->_name, $this->matchColumn);
 
         try {
-            $table->db()->exec($query, $this->matchValue);
+            $table->db()->exec($query, [$this->matchValue]);
         } catch (DatabaseException $e) {
             throw ModelQueryException::QueryFailed("delete", $table->_name);
         }
