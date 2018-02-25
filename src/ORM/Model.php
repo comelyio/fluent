@@ -76,11 +76,10 @@ abstract class Model implements \Serializable
         // Populate
         if (is_array($row)) {
             $this->populate($row);
-        }
-
-        // Callback event: onLoad
-        if (method_exists($this, "onLoad")) {
-            call_user_func([$this, "onLoad"]);
+            // Callback event: onLoad
+            if (method_exists($this, "onLoad")) {
+                call_user_func([$this, "onLoad"]);
+            }
         }
     }
 
