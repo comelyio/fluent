@@ -278,7 +278,7 @@ abstract class Model implements \Serializable
         }
 
         // Check if property exists with get_called_class() instead of $this instance for only public props.
-        // $this->name = get_called_class()
+        // $this->_name = get_called_class()
         if (property_exists($this->_name, $prop)) {
             $this->$prop = $value; // Public property
         } else {
@@ -292,7 +292,7 @@ abstract class Model implements \Serializable
      */
     final public function get(string $prop)
     {
-        return $this->$prop ?? $this->privateProps[$prop] ?? null;
+        return $this->$prop ?? $this->_privateProps[$prop] ?? null;
     }
 
     /**
@@ -301,7 +301,7 @@ abstract class Model implements \Serializable
      */
     final public function private(string $prop)
     {
-        return $this->privateProps[$prop] ?? null;
+        return $this->_privateProps[$prop] ?? null;
     }
 
     /**
@@ -343,7 +343,7 @@ abstract class Model implements \Serializable
      */
     final public function value(AbstractColumn $column)
     {
-        return $this->original[$column->_name] ?? null;
+        return $this->_original[$column->_name] ?? null;
     }
 
     /**
@@ -355,8 +355,8 @@ abstract class Model implements \Serializable
         $difference = [];
         foreach ($this->_table->columns() as $column) {
             $camelKey = Comely::camelCase($column->_name);
-            $existingValue = $this->$camelKey ?? $this->privateProps[$camelKey] ?? null;
-            $originalValue = $this->original[$column->_name] ?? null;
+            $existingValue = $this->$camelKey ?? $this->_privateProps[$camelKey] ?? null;
+            $originalValue = $this->_original[$column->_name] ?? null;
 
             // Validate existing value as per column type
             $this->validateColumnValue($column, $camelKey, $existingValue);
