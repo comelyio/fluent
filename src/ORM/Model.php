@@ -253,7 +253,7 @@ abstract class Model implements \Serializable
     /**
      * @return string
      */
-    final public function name(): string
+    final public function class(): string
     {
         return $this->_name;
     }

@@ -130,7 +130,7 @@ class Query
     {
         if (!$this->matchColumn) {
             throw new ModelQueryException(
-                sprintf('"%s" %s query requires a PRIMARY/UNIQUE column', $this->model->name(), strtoupper($query))
+                sprintf('"%s" %s query requires a PRIMARY/UNIQUE column', $this->model->class(), strtoupper($query))
             );
         }
 
@@ -140,7 +140,7 @@ class Query
                     '"%s" cannot be empty/NULL for %s "%s" query',
                     $this->matchColumn,
                     strtoupper($query),
-                    $this->model->name()
+                    $this->model->class()
                 )
             );
         }
