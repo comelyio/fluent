@@ -56,7 +56,7 @@ class Query
         $primaryColumn = $model->getPrimaryColumn();
         if ($primaryColumn) {
             $this->matchColumn = $primaryColumn->_name;
-            $this->matchValue = $this->model->value($primaryColumn);
+            $this->matchValue = $this->model->original($primaryColumn);
         }
     }
 

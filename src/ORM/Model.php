@@ -330,20 +330,16 @@ abstract class Model implements \Serializable
     }
 
     /**
-     * @return array
+     * @param AbstractColumn|null $column
+     * @return array|mixed|null
      */
-    final public function original(): array
+    final public function original(?AbstractColumn $column = null)
     {
-        return $this->_original;
-    }
+        if($column) {
+            return $this->_original[$column->_name] ?? null;
+        }
 
-    /**
-     * @param AbstractColumn $column
-     * @return mixed|null
-     */
-    final public function value(AbstractColumn $column)
-    {
-        return $this->_original[$column->_name] ?? null;
+        return $this->_original;
     }
 
     /**
