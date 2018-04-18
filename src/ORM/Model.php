@@ -155,11 +155,11 @@ abstract class Model implements \Serializable
 
         // Manually declare properties of this (abstract Model) class
         $fluent = [];
-        $fluent["name"] = $this->_name;
-        $fluent["table"] = $this->_table->_name;
-        $fluent["privateProps"] = $this->_privateProps;
-        $fluent["original"] = $this->_original;
-        $fluent["primaryColumn"] = null;
+        $fluent["_name"] = $this->_name;
+        $fluent["_table"] = $this->_table->_name;
+        $fluent["_privateProps"] = $this->_privateProps;
+        $fluent["_original"] = $this->_original;
+        $fluent["_primaryColumn"] = null;
 
         return serialize(["props" => $props, "fluent" => $fluent]);
     }
