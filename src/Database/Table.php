@@ -173,6 +173,44 @@ abstract class Table implements Constants
     }
 
     /**
+     * @param string $query
+     * @param array|null $params
+     * @return array
+     * @throws FluentException
+     */
+    final public static function findWhere(string $query = "1", ?array $params = null): array
+    {
+        $table = Fluent::Retrieve(strval(static::NAME));
+        $modelsClass = $table->_models;
+        if (!$modelsClass) {
+            throw new FluentException(sprintf('constant MODELS not defined for table "%s"', get_called_class()));
+        }
+
+        try {
+            $rows = $table->db()->fetch(
+                sprintf('SELECT' . ' * FROM `%s` WHERE %s', $table->_name, $query),
+                $params ?? []
+            );
+        } catch (DatabaseException $e) {
+            throw new FluentException($e->getMessage());
+        }
+
+        $models = [];
+        if ($rows) {
+            foreach ($rows as $row) {
+                try {
+                    $rowModel = new $modelsClass($row);
+                    $models[] = $rowModel;
+                } catch (FluentException $e) {
+                    trigger_error($e->getMessage(), E_USER_WARNING);
+                }
+            }
+        }
+
+        return $models;
+    }
+
+    /**
      * @return Database
      */
     final public function db(): Database
