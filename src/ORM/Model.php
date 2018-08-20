@@ -359,8 +359,10 @@ abstract class Model implements \Serializable
 
             // Compare with original value
             if (is_null($originalValue)) {
-                // Original value does NOT exist (or is NULL)
-                $difference[$column->_name] = $existingValue;
+                if($existingValue) {
+                    // Original value does NOT exist (or is NULL)
+                    $difference[$column->_name] = $existingValue;
+                }
             } else {
                 // Original value found, compare
                 if ($existingValue !== $originalValue) {
