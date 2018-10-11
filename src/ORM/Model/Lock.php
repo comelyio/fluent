@@ -121,7 +121,7 @@ class Lock
         // Cross-checking?
         if (isset($crosscheckColumn, $crosscheckValue)) {
             $fetched = $fetch[0][$crosscheckColumn->_name];
-            if (!array_key_exists($crosscheckColumn->_name, $fetched[0] ?? []) || $fetched !== $crosscheckValue) {
+            if (!array_key_exists($crosscheckColumn->_name, $fetch[0] ?? []) || $fetched !== $crosscheckValue) {
                 throw new ModelLockException(
                     sprintf(
                         'Cross-checking "%s" failed on lock obtain in table "%s"',
