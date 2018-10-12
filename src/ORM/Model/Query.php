@@ -157,13 +157,21 @@ class Query
         $this->validateMatchClause("save");
         $table = $this->model->table();
 
+        $saveData = $this->changes;
+
         $insertColumns = [];
         $insertParams = [];
         $updateParams = [];
-        foreach ($this->changes as $key => $value) {
+        foreach ($saveData as $key => $value) {
             $insertColumns[] = sprintf('`%s`', $key);
             $insertParams[] = ":" . $key;
             $updateParams[] = sprintf('`%1$s`=:%1$s', $key);
+        }
+
+        if (!array_key_exists($this->matchColumn, $saveData)) {
+            $insertColumns[] = sprintf('`%s`', $this->matchColumn);
+            $insertParams[] = ":" . $this->matchColumn;
+            $saveData[$this->matchColumn] = $this->matchValue;
         }
 
         $query = sprintf(
@@ -174,9 +182,8 @@ class Query
             implode(", ", $updateParams)
         );
 
-
         try {
-            $table->db()->exec($query, $this->changes);
+            $table->db()->exec($query, $saveData);
         } catch (DatabaseException $e) {
             throw ModelQueryException::QueryFailed("save", $table->_name);
         }
