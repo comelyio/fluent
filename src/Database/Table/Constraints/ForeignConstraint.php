@@ -26,6 +26,8 @@ class ForeignConstraint extends AbstractConstraint
     protected $table;
     /** @var null|string */
     protected $col;
+    /** @var null|string */
+    protected $db;
 
     /**
      * @param string $table
@@ -36,6 +38,16 @@ class ForeignConstraint extends AbstractConstraint
     {
         $this->table = $table;
         $this->col = $column;
+        return $this;
+    }
+
+    /**
+     * @param string $db
+     * @return ForeignConstraint
+     */
+    public function database(string $db): self
+    {
+        $this->db = $db;
         return $this;
     }
 
@@ -61,15 +73,16 @@ class ForeignConstraint extends AbstractConstraint
      */
     protected function constraintSQL(string $driver): ?string
     {
+        $tableReference = $this->db ? sprintf('`%s`.`%s`', $this->db, $this->table) : sprintf('`%s`', $this->table);
         switch ($driver) {
             case "mysql":
-                return sprintf('FOREIGN KEY (`%s`) REFERENCES `%s`(`%s`)', $this->name, $this->table, $this->col);
+                return sprintf('FOREIGN KEY (`%s`) REFERENCES %s(`%s`)', $this->name, $tableReference, $this->col);
             case "sqlite":
                 return sprintf(
-                    'CONSTRAINT `%s` FOREIGN KEY (`%s`) REFERENCES `%s`(`%s`)',
+                    'CONSTRAINT `%s` FOREIGN KEY (`%s`) REFERENCES %s(`%s`)',
                     sprintf('cnstrnt_%s_frgn', $this->name),
                     $this->name,
-                    $this->table,
+                    $tableReference,
                     $this->col
                 );
         }
