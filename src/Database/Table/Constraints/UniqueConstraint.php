@@ -35,7 +35,7 @@ class UniqueConstraint extends AbstractConstraint
     }
 
     /**
-     * @param string[] ...$cols
+     * @param string ...$cols
      * @return UniqueConstraint
      */
     public function columns(string ...$cols): self

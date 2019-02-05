@@ -21,9 +21,8 @@ namespace Comely\Fluent\Database\Table\Traits;
 trait StringValueTrait
 {
     /**
-     * @param null|string $value
-     * @return self
-     * @throws \Comely\Fluent\Exception\FluentTableException
+     * @param string|null $value
+     * @return StringValueTrait
      */
     final public function default(?string $value): self
     {

@@ -39,7 +39,7 @@ class EnumColumn extends AbstractColumn
     }
 
     /**
-     * @param string[] ...$options
+     * @param string ...$options
      * @return EnumColumn
      */
     public function options(string ...$options): self
