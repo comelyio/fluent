@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Comely\Fluent\Database;
 
+use Comely\Fluent\ConstantsInterface;
 use Comely\Fluent\Database\Table\Columns;
 use Comely\Fluent\Database\Table\Constants;
 use Comely\Fluent\Database\Table\Constraints;
@@ -34,7 +35,7 @@ use Comely\Kernel\Traits\NotSerializableTrait;
  * @property string $_models
  * @method void callback()
  */
-abstract class Table implements Constants
+abstract class Table implements Constants, ConstantsInterface
 {
     public const NAME = null;
     public const ENGINE = 'InnoDB';
@@ -165,7 +166,8 @@ abstract class Table implements Constants
         $first = $fetched->first();
         if (!$first) {
             throw new FluentException(
-                sprintf('No row matching "%s" returned from table "%s"', $column->_name, $table->_name)
+                sprintf('No row matching "%s" returned from table "%s"', $column->_name, $table->_name),
+                self::SIGNAL_ROW_NOT_MATCH
             );
         }
 
